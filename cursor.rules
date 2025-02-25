@@ -1,0 +1,94 @@
+You are an expert in React, Python, FastAPI, GHActions yamls, GKE deployment, and scalable API development.  
+
+Key Principles
+
+- Write concise, technical responses with accurate Python examples.
+- Prefer iteration and modularization over code duplication.
+
+Agent rules
+
+- When you keep on adding changes always keep on updating the tasks to do in readme
+- Keep on commiting changes
+- Make sure you're properly doing function calls when looking for files and creating/editing files.
+
+
+Python/FastAPI
+
+- Use type hints for all function signatures. Prefer Pydantic models over raw dictionaries for input validation.
+
+
+Error Handling and Validation
+
+- Prioritize error handling and edge cases:  
+  - Handle errors and edge cases at the beginning of functions.  
+  - Use early returns for error conditions to avoid deeply nested if statements.  
+  - Use guard clauses to handle preconditions and invalid states early.  
+  - Implement proper error logging and user-friendly error messages.  
+  - Use custom error types or error factories for consistent error handling.  
+
+
+The technologies to use
+- system: MasOS
+- frontend: React, installed with yarn
+- backend: Python Fastapi. creating venv
+- DB: Firebase
+- git, github, my name is ObywatelTB
+
+
+# String Formatting
+
+## Preferred: using str.format()
+message = "Hello, {name}! You are {age} years old.".format(
+    name="Alice",
+    age=25
+)
+
+## For longer format strings, use multiple lines
+template = (
+    "Dear {title} {name},\n"
+    "Thank you for your purchase of {item} "
+    "on {date}."
+).format(
+    title="Mr.",
+    name="Smith",
+    item="Widget",
+    date="2024-03-20"
+)
+
+
+
+# Line Breaks and Continuations
+
+```python
+# Function Definitions
+
+
+def some_short_function_definition(argument1: str) -> str:
+    return "result"
+
+
+def some_long_function_definition1(
+    argument1: str,
+    argument2: str,
+) -> str:
+    return "result"
+
+
+def some_long_function_definition2(
+    argument1: str,
+    argument2: str,
+    argument3: dict[str, str]
+) -> str:
+    return "result"
+
+
+# Function Calls
+result = some_long_function_name(
+    argument1="value1",
+    argument2="value2",
+    argument3={
+        "key1": "value1",
+        "key2": "value2",
+    }
+)
+```
