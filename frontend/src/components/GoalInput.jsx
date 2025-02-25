@@ -22,7 +22,7 @@ const GoalInput = ({ onGoalProcessed }) => {
       // Get API URL from environment variable or use default
       const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
       
-      const response = await axios.post(`${apiUrl}/process-goal`, {
+      const response = await axios.post(`${apiUrl}/api/v1/goals/process`, {
         goal: goal,
         // We'll add user_id when authentication is implemented
         user_id: null
