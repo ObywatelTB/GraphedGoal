@@ -18,13 +18,7 @@ GraphedGoal allows users to input a goal they want to achieve, then processes it
 ### Backend
 - Python FastAPI
 - Virtual environment for dependency management
-- Structured modular architecture with:
-  - API routes
-  - Database operations
-  - LLM integration
-  - Models (Pydantic)
-  - Config
-  - Utils
+- Modular structure with services, models, and API layers
 
 ### Database
 - Firebase
@@ -47,7 +41,7 @@ GraphedGoal allows users to input a goal they want to achieve, then processes it
 - [x] Create pre-commit hook for running tests
 - [x] Configure launch for breakpoint debugging
 - [x] Create comprehensive documentation
-- [x] Refactor backend to use a structured modular architecture
+- [x] Refactor backend for better modularity
 
 ## Repository
 The project is hosted on GitHub: [GraphedGoal](https://github.com/ObywatelTB/GraphedGoal)
@@ -91,6 +85,15 @@ The project is hosted on GitHub: [GraphedGoal](https://github.com/ObywatelTB/Gra
    ./run.sh
    ```
 
+### Backend Architecture
+The backend follows a modular architecture:
+- `app/main.py`: Application entry point and configuration
+- `app/api/`: API endpoints and routing
+- `app/models/`: Data models using Pydantic
+- `app/services/`: Business logic and external service integration
+- `app/db/`: Database connections and operations
+- `app/core/`: Core functionality and configuration
+
 ### Frontend Setup
 1. Navigate to the frontend directory:
    ```
@@ -113,7 +116,6 @@ The project is hosted on GitHub: [GraphedGoal](https://github.com/ObywatelTB/Gra
 
 The following environment variables are needed:
 - OPENAI_API_KEY - Your OpenAI API key
-- OPENAI_MODEL - The OpenAI model to use (default: o3-mini)
 - FIREBASE_SERVICE_ACCOUNT_KEY - Path to your Firebase service account key JSON file
 - BACKEND_HOST - Host for the backend server (default: 0.0.0.0)
 - BACKEND_PORT - Port for the backend server (default: 8000)
@@ -121,42 +123,6 @@ The following environment variables are needed:
 - Firebase configuration variables for the frontend (see `.env.sample`)
 
 *Detailed setup instructions will be provided as the project progresses.* 
-
-## Backend Structure
-
-The backend follows a modular architecture:
-
-```
-backend/
-├── app/
-│   ├── api/
-│   │   ├── routes/
-│   │   │   ├── __init__.py
-│   │   │   └── goals.py
-│   │   └── __init__.py
-│   ├── core/
-│   │   ├── __init__.py
-│   │   └── config.py
-│   ├── db/
-│   │   ├── __init__.py
-│   │   └── firebase.py
-│   ├── models/
-│   │   ├── __init__.py
-│   │   └── goal.py
-│   ├── services/
-│   │   ├── __init__.py
-│   │   └── openai_service.py
-│   ├── utils/
-│   │   └── __init__.py
-│   ├── __init__.py
-│   └── main.py
-├── tests/
-│   ├── __init__.py
-│   └── test_api.py
-├── main.py
-├── requirements.txt
-└── run.sh
-```
 
 ## Testing
 
