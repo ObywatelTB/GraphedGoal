@@ -33,13 +33,13 @@ GraphedGoal allows users to input a goal they want to achieve, then processes it
 - [x] Create GitHub repository
 - [x] Set up basic backend with FastAPI
 - [x] Set up basic frontend with React
-- [ ] Connect with existing Firebase database - set the keys in .env
+- [x] Connect with existing Firebase database - set the keys in .env
 - [x] Implement LLM processing with OpenAI o3-mini
 - [x] Implement tree-graph visualization
-- [ ] Set up unit tests for frontend and backend
-- [ ] Create pre-commit hook for running tests
-- [ ] Configure launch for breakpoint debugging
-- [ ] Create comprehensive documentation
+- [x] Set up unit tests for frontend and backend
+- [x] Create pre-commit hook for running tests
+- [x] Configure launch for breakpoint debugging
+- [x] Create comprehensive documentation
 
 ## Repository
 The project is hosted on GitHub: [GraphedGoal](https://github.com/ObywatelTB/GraphedGoal)
@@ -112,3 +112,27 @@ The following environment variables are needed:
 - Firebase configuration variables for the frontend (see `.env.sample`)
 
 *Detailed setup instructions will be provided as the project progresses.* 
+
+## Testing
+
+### Backend Tests
+The backend uses pytest for unit testing. To run the tests:
+```
+cd backend
+pytest
+```
+
+### Frontend Tests
+The frontend uses Jest and React Testing Library for unit testing. To run the tests:
+```
+cd frontend
+yarn test
+```
+
+## Debugging
+
+The project includes VSCode debug configurations for both frontend and backend development. These can be accessed from the Debug panel in VSCode.
+
+## Contributing
+
+For detailed information on how to contribute to this project, see [CONTRIBUTING.md](CONTRIBUTING.md). 

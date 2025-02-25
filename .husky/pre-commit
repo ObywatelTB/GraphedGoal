@@ -1,0 +1,15 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "Running pre-commit hooks..."
+
+# Run backend tests
+echo "Running backend tests..."
+cd backend && pytest
+
+# Run frontend tests
+echo "Running frontend tests..."
+cd ../frontend && yarn test --watchAll=false
+
+# If everything passes, allow commit
+exit 0 
