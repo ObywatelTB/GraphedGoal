@@ -4,7 +4,7 @@
 export interface SubgoalNode {
   id: string;
   label: string;
-  parent_id: string | null;
+  parent_id?: string | null;
   description?: string;
 }
 
@@ -26,24 +26,33 @@ export interface SavedGoalGraph {
   id: string;
   goal: string;
   nodes: SubgoalNode[];
-  created_at: any; // Firebase timestamp
+  created_at: Timestamp;
   user_id: string;
 }
 
 // For the force-directed graph visualization
 export interface GraphData {
-  nodes: GraphNode[];
-  links: GraphLink[];
+  nodes: Array<{
+    id: string;
+    name: string;
+    description?: string;
+    val?: number;
+  }>;
+  links: Array<{
+    source: string;
+    target: string;
+  }>;
 }
 
-export interface GraphNode {
-  id: string;
-  name: string;
-  description?: string;
-  val?: number; // Size of the node
+// Timestamp type for Firestore
+export interface Timestamp {
+  seconds: number;
+  nanoseconds: number;
 }
 
-export interface GraphLink {
-  source: string;
-  target: string;
+// User profile type
+export interface UserProfile {
+  uid: string;
+  email: string;
+  displayName?: string;
 } 

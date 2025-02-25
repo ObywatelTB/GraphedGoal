@@ -44,6 +44,10 @@ build/
 firebase-debug.log
 serviceAccountKey.json
 
+# Firebase credentials
+firebase-credentials.json
+*firebase-credentials*.json
+
 # IDE
 .idea/
 .vscode/

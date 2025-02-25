@@ -4,27 +4,34 @@ import Header from './components/Header';
 import HomePage from './pages/HomePage';
 import AboutPage from './pages/AboutPage';
 import HistoryPage from './pages/HistoryPage';
+import AuthPage from './pages/AuthPage';
+import ProfilePage from './pages/ProfilePage';
+import { UserProvider } from './contexts/UserContext';
 import './App.css';
 
 const App: React.FC = () => {
   return (
-    <Router>
-      <div className="app">
-        <Header />
-        <main className="main-content">
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/history" element={<HistoryPage />} />
-          </Routes>
-        </main>
-        <footer className="footer">
-          <div className="container">
-            <p>&copy; {new Date().getFullYear()} GraphedGoal. All rights reserved.</p>
-          </div>
-        </footer>
-      </div>
-    </Router>
+    <UserProvider>
+      <Router>
+        <div className="app">
+          <Header />
+          <main className="main-content">
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/history" element={<HistoryPage />} />
+              <Route path="/auth" element={<AuthPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+            </Routes>
+          </main>
+          <footer className="footer">
+            <div className="container">
+              <p>&copy; {new Date().getFullYear()} GraphedGoal. All rights reserved.</p>
+            </div>
+          </footer>
+        </div>
+      </Router>
+    </UserProvider>
   );
 };
 

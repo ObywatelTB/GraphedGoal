@@ -33,13 +33,16 @@ GraphedGoal allows users to input a goal they want to achieve, then processes it
 - [x] Create GitHub repository
 - [x] Set up basic backend with FastAPI
 - [x] Set up basic frontend with React
-- [ ] Create Firebase database
-- [ ] Implement LLM processing with OpenAI o3-mini
-- [ ] Implement tree-graph visualization
+- [ ] Connect with existing Firebase database - set the keys in .env
+- [x] Implement LLM processing with OpenAI o3-mini
+- [x] Implement tree-graph visualization
 - [ ] Set up unit tests for frontend and backend
 - [ ] Create pre-commit hook for running tests
 - [ ] Configure launch for breakpoint debugging
 - [ ] Create comprehensive documentation
+
+## Repository
+The project is hosted on GitHub: [GraphedGoal](https://github.com/ObywatelTB/GraphedGoal)
 
 ## Getting Started
 
