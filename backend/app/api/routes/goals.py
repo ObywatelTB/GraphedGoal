@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException
 from typing import List, Dict, Any
 
 from app.models import GoalRequest, GoalGraphResponse, GoalGraphUpdateRequest
-from app.services import generate_goal_breakdown, regenerate_goal_breakdown
+from app.services import generate_goal_breakdown, regenerate_goal_breakdown, process_goal_with_dual_llm
 from app.db import (
     save_goal_graph,
     get_user_goal_graphs,
@@ -17,15 +17,15 @@ router = APIRouter(prefix="/goals", tags=["goals"])
 
 @router.post("/process", response_model=GoalGraphResponse)
 async def process_goal(request: GoalRequest):
-    """Process a goal and generate a breakdown of subgoals."""
+    """Process a goal and generate a breakdown of subgoals using dual LLM approach."""
     try:
         # Validate input
         if not request.goal or len(request.goal.strip()) == 0:
             raise HTTPException(status_code=400, detail="Goal cannot be empty")
 
-        # Call the OpenAI service to generate subgoals
+        # Call the dual LLM service to analyze the goal and generate a graph structure
         try:
-            nodes = generate_goal_breakdown(request.goal)
+            nodes = process_goal_with_dual_llm(request.goal)
         except ValueError as e:
             raise HTTPException(status_code=500, detail=str(e))
 
@@ -131,7 +131,7 @@ async def update_goal_graph_endpoint(graph_id: str, request: GoalGraphUpdateRequ
 
 @router.post("/{graph_id}/regenerate", response_model=GoalGraphResponse)
 async def regenerate_goal_graph_endpoint(graph_id: str):
-    """Regenerate subgoals for an existing goal using the LLM."""
+    """Regenerate subgoals for an existing goal using the dual LLM approach."""
     try:
         # Get the existing goal graph
         graph = get_goal_graph_by_id(graph_id)
@@ -145,9 +145,9 @@ async def regenerate_goal_graph_endpoint(graph_id: str):
             raise HTTPException(
                 status_code=400, detail="Goal text not found in the existing graph")
 
-        # Call the OpenAI service to regenerate subgoals
+        # Call the dual LLM service to regenerate the graph structure
         try:
-            nodes = regenerate_goal_breakdown(goal_text)
+            nodes = process_goal_with_dual_llm(goal_text)
         except ValueError as e:
             raise HTTPException(status_code=500, detail=str(e))
 
