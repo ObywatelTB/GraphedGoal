@@ -1,30 +1,33 @@
-from fastapi import APIRouter, HTTPException, Depends
-from typing import List, Dict, Any
 import uuid
+from fastapi import APIRouter, HTTPException
+from typing import List, Dict, Any
 
-from ...models.goal import GoalRequest, GoalGraphResponse, GoalGraphUpdateRequest, SubgoalNode
-from ...services.openai_service import openai_service
-from ...db.firebase import firebase_client
+from app.models import GoalRequest, GoalGraphResponse, GoalGraphUpdateRequest
+from app.services import generate_goal_breakdown, regenerate_goal_breakdown
+from app.db import (
+    save_goal_graph,
+    get_user_goal_graphs,
+    get_goal_graph_by_id,
+    delete_goal_graph,
+    update_goal_graph
+)
 
-router = APIRouter()
+router = APIRouter(prefix="/goals", tags=["goals"])
 
 
-@router.post("/process-goal", response_model=GoalGraphResponse)
+@router.post("/process", response_model=GoalGraphResponse)
 async def process_goal(request: GoalRequest):
-    """Process a goal and generate a graph of subgoals."""
+    """Process a goal and generate a breakdown of subgoals."""
     try:
         # Validate input
         if not request.goal or len(request.goal.strip()) == 0:
             raise HTTPException(status_code=400, detail="Goal cannot be empty")
 
-        # Generate goal graph using OpenAI
+        # Call the OpenAI service to generate subgoals
         try:
-            nodes = openai_service.generate_goal_graph(request.goal)
+            nodes = generate_goal_breakdown(request.goal)
         except ValueError as e:
-            raise HTTPException(status_code=400, detail=str(e))
-        except Exception as e:
-            raise HTTPException(
-                status_code=500, detail=f"Error generating goal graph: {str(e)}")
+            raise HTTPException(status_code=500, detail=str(e))
 
         # Save to Firebase if user_id is provided
         saved = False
@@ -35,7 +38,7 @@ async def process_goal(request: GoalRequest):
             graph_id = str(uuid.uuid4())
 
             # Save to Firebase and get the document ID
-            saved_graph_id = firebase_client.save_goal_graph(
+            saved_graph_id = save_goal_graph(
                 request.user_id, request.goal, nodes, graph_id)
 
             # If saving was successful, update the saved flag
@@ -46,7 +49,6 @@ async def process_goal(request: GoalRequest):
                 graph_id = None
 
         return {"nodes": nodes, "saved": saved, "graph_id": graph_id}
-
     except HTTPException as e:
         raise e
     except Exception as e:
@@ -54,21 +56,21 @@ async def process_goal(request: GoalRequest):
             status_code=500, detail=f"Unexpected error: {str(e)}")
 
 
-@router.get("/user/{user_id}/goal-graphs", response_model=List[Dict[str, Any]])
-async def get_user_goal_graphs(user_id: str):
+@router.get("/user/{user_id}", response_model=List[Dict[str, Any]])
+async def get_user_goal_graphs_endpoint(user_id: str):
     """Retrieve all goal graphs for a specific user."""
     try:
-        graphs = firebase_client.get_user_goal_graphs(user_id)
+        graphs = get_user_goal_graphs(user_id)
         return graphs
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/goal-graph/{graph_id}", response_model=Dict[str, Any])
-async def get_goal_graph(graph_id: str):
+@router.get("/{graph_id}", response_model=Dict[str, Any])
+async def get_goal_graph_endpoint(graph_id: str):
     """Retrieve a specific goal graph by its ID."""
     try:
-        graph = firebase_client.get_goal_graph_by_id(graph_id)
+        graph = get_goal_graph_by_id(graph_id)
         if not graph:
             raise HTTPException(status_code=404, detail="Goal graph not found")
         return graph
@@ -78,11 +80,11 @@ async def get_goal_graph(graph_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.delete("/goal-graph/{graph_id}")
-async def delete_goal_graph(graph_id: str):
+@router.delete("/{graph_id}")
+async def delete_goal_graph_endpoint(graph_id: str):
     """Delete a specific goal graph by its ID."""
     try:
-        success = firebase_client.delete_goal_graph(graph_id)
+        success = delete_goal_graph(graph_id)
         if not success:
             raise HTTPException(
                 status_code=404, detail="Goal graph not found or could not be deleted")
@@ -93,8 +95,8 @@ async def delete_goal_graph(graph_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.put("/goal-graph/{graph_id}")
-async def update_goal_graph(graph_id: str, request: GoalGraphUpdateRequest):
+@router.put("/{graph_id}")
+async def update_goal_graph_endpoint(graph_id: str, request: GoalGraphUpdateRequest):
     """Update a specific goal graph by its ID."""
     try:
         # Validate that at least one field is provided
@@ -112,7 +114,7 @@ async def update_goal_graph(graph_id: str, request: GoalGraphUpdateRequest):
                 if not all(key in node for key in ["id", "label"]):
                     raise ValueError("Invalid node structure in request")
 
-        success = firebase_client.update_goal_graph(
+        success = update_goal_graph(
             graph_id, request.goal, nodes_dict)
         if not success:
             raise HTTPException(
@@ -127,12 +129,12 @@ async def update_goal_graph(graph_id: str, request: GoalGraphUpdateRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/goal-graph/{graph_id}/regenerate", response_model=GoalGraphResponse)
-async def regenerate_goal_graph(graph_id: str):
+@router.post("/{graph_id}/regenerate", response_model=GoalGraphResponse)
+async def regenerate_goal_graph_endpoint(graph_id: str):
     """Regenerate subgoals for an existing goal using the LLM."""
     try:
         # Get the existing goal graph
-        graph = firebase_client.get_goal_graph_by_id(graph_id)
+        graph = get_goal_graph_by_id(graph_id)
         if not graph:
             raise HTTPException(status_code=404, detail="Goal graph not found")
 
@@ -143,21 +145,18 @@ async def regenerate_goal_graph(graph_id: str):
             raise HTTPException(
                 status_code=400, detail="Goal text not found in the existing graph")
 
-        # Generate new goal graph using OpenAI
+        # Call the OpenAI service to regenerate subgoals
         try:
-            nodes = openai_service.regenerate_goal_graph(goal_text)
+            nodes = regenerate_goal_breakdown(goal_text)
         except ValueError as e:
-            raise HTTPException(status_code=400, detail=str(e))
-        except Exception as e:
-            raise HTTPException(
-                status_code=500, detail=f"Error regenerating goal graph: {str(e)}")
+            raise HTTPException(status_code=500, detail=str(e))
 
-        # Update the existing graph in Firebase
-        success = firebase_client.update_goal_graph(graph_id, None, nodes)
+        # Update the existing graph with new nodes
+        success = update_goal_graph(graph_id, nodes=nodes)
+        saved = success
 
-        return {"nodes": nodes, "saved": success, "graph_id": graph_id}
+        return {"nodes": nodes, "saved": saved, "graph_id": graph_id if saved else None}
     except HTTPException as e:
         raise e
     except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Unexpected error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))

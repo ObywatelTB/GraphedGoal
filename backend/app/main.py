@@ -1,16 +1,40 @@
-import uvicorn
-import os
-from dotenv import load_dotenv
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-# Load environment variables
-load_dotenv()
+# Try both relative and absolute imports
+try:
+    from app.core.config import settings
+    from app.api import router as api_router
+except ImportError:  # If running from within the app directory
+    from core.config import settings
+    from api import router as api_router
 
-if __name__ == "__main__":
-    host = os.getenv("BACKEND_HOST", "0.0.0.0")
-    port = int(os.getenv("BACKEND_PORT", "8000"))
-    uvicorn.run(
-        "app.main:app",
-        host=host,
-        port=port,
-        reload=True
+
+def create_application() -> FastAPI:
+    """Create and configure the FastAPI application."""
+    app = FastAPI(
+        title=settings.PROJECT_NAME,
+        description="API for goal visualization and planning",
     )
+
+    # Configure CORS
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.BACKEND_CORS_ORIGINS,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    # Include API routes
+    app.include_router(api_router, prefix=settings.API_V1_STR)
+
+    # Add root endpoint
+    @app.get("/")
+    async def root():
+        return {"message": "Welcome to GraphedGoal API"}
+
+    return app
+
+
+app = create_application()
