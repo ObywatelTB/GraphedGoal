@@ -1,5 +1,7 @@
 # GraphedGoal
 
+<!-- Komentarz -->
+
 A web application that helps users visualize paths to achieve their personal goals.
 
 ## Concept
